@@ -73,7 +73,7 @@ impl Shape for FixedWidth {
 
     fn shape(&self, stream: &Stream) -> Result<Shaped, ShapeError> {
         let bytes = stream.bytes();
-        let refused = |(reason, at): (&str, usize)| ShapeError::new("fixed-width", reason).at(at);
+        let refused = |stop| ShapeError::refused("fixed-width", stop);
         record::text(bytes).map_err(refused)?;
         let lines = record::lines(bytes);
         if lines.is_empty() {
