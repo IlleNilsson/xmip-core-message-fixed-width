@@ -14,7 +14,7 @@
 //! validates. What cannot be sectioned — a line shorter than its positions,
 //! bytes that are not text — is refused with the byte where the walk
 //! stopped. The shape claims `text/x-fixed-width` and, asked without a media
-//! type, recognises at least two lines of one length, or, with positions,
+//! type, recognizes at least two lines of one length, or, with positions,
 //! lines that all fill them.
 
 use message::record::{self, Position};
@@ -59,7 +59,7 @@ impl Shape for FixedWidth {
         &["text/x-fixed-width"]
     }
 
-    fn recognises(&self, bytes: &[u8]) -> bool {
+    fn recognizes(&self, bytes: &[u8]) -> bool {
         if record::text(bytes).is_err() {
             return false;
         }
@@ -178,17 +178,17 @@ mod tests {
     }
 
     #[test]
-    fn the_shape_claims_fixed_width_and_recognises_lines_of_one_length_or_of_its_positions() {
+    fn the_shape_claims_fixed_width_and_recognizes_lines_of_one_length_or_of_its_positions() {
         assert_eq!(FixedWidth::lines().technology(), "fixed-width");
         assert_eq!(FixedWidth::lines().media_types(), &["text/x-fixed-width"]);
-        assert!(FixedWidth::lines().recognises(b"001Anna\n002Bo  \n"));
-        assert!(!FixedWidth::lines().recognises(b"001Anna\n002Bo\n"));
-        assert!(!FixedWidth::lines().recognises(b"001Anna"));
-        assert!(!FixedWidth::lines().recognises(b"ab\nab\x00"));
-        assert!(layout().recognises(b"001Anna"));
-        assert!(layout().recognises(b"001Anna\n002Bo  longer"));
-        assert!(!layout().recognises(b"001An"));
-        assert!(!layout().recognises(b""));
+        assert!(FixedWidth::lines().recognizes(b"001Anna\n002Bo  \n"));
+        assert!(!FixedWidth::lines().recognizes(b"001Anna\n002Bo\n"));
+        assert!(!FixedWidth::lines().recognizes(b"001Anna"));
+        assert!(!FixedWidth::lines().recognizes(b"ab\nab\x00"));
+        assert!(layout().recognizes(b"001Anna"));
+        assert!(layout().recognizes(b"001Anna\n002Bo  longer"));
+        assert!(!layout().recognizes(b"001An"));
+        assert!(!layout().recognizes(b""));
 
         let shapes: [&dyn Shape; 1] = [&FixedWidth::lines()];
         let by_media = message::choose(&shapes, &stream(b"x", Some("Text/X-Fixed-Width")));
