@@ -72,7 +72,7 @@ impl Shape for FixedWidth {
     }
 
     fn shape(&self, stream: &Stream) -> Result<Shaped, ShapeError> {
-        let bytes = stream.bytes();
+        let bytes = message::loaded(self.technology(), stream)?;
         let refused = |stop| ShapeError::refused("fixed-width", stop);
         record::text(bytes).map_err(refused)?;
         let lines = record::lines(bytes);
@@ -191,10 +191,15 @@ mod tests {
         assert!(!layout().recognizes(b""));
 
         let shapes: [&dyn Shape; 1] = [&FixedWidth::lines()];
-        let by_media = message::choose(&shapes, &stream(b"x", Some("Text/X-Fixed-Width")));
+        let by_media =
+            message::choose(&shapes, &stream(b"x", Some("Text/X-Fixed-Width"))).expect("held");
         assert_eq!(by_media.map(Shape::technology), Some("fixed-width"));
-        let by_look = message::choose(&shapes, &stream(b"aa\nbb", None));
+        let by_look = message::choose(&shapes, &stream(b"aa\nbb", None)).expect("held");
         assert_eq!(by_look.map(Shape::technology), Some("fixed-width"));
-        assert!(message::choose(&shapes, &stream(b"a\nbb", None)).is_none());
+        assert!(
+            message::choose(&shapes, &stream(b"a\nbb", None))
+                .expect("held")
+                .is_none()
+        );
     }
 }
